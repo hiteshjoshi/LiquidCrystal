@@ -2,9 +2,10 @@ package LiquidCrystal
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hybridgroup/gobot"
 	"github.com/hybridgroup/gobot/platforms/i2c"
-	"time"
 )
 
 const (
@@ -60,7 +61,7 @@ var _ gobot.Driver = (*LiquidCrystalDriver)(nil)
 type LiquidCrystalDriver struct {
 	name        string
 	connection  i2c.I2c
-	addr        byte
+	addr        int
 	backlight   byte
 	cols        int
 	rows        int
@@ -71,7 +72,7 @@ type LiquidCrystalDriver struct {
 }
 
 // NewLiquidCrystalDriver creates a new driver with specified name and i2c interface
-func NewLiquidCrystalDriver(a i2c.I2c, name string, addr byte, cols int, rows int) *LiquidCrystalDriver {
+func NewLiquidCrystalDriver(a i2c.I2c, name string, addr int, cols int, rows int) *LiquidCrystalDriver {
 	return &LiquidCrystalDriver{
 		name:       name,
 		connection: a,
@@ -281,7 +282,7 @@ func (h *LiquidCrystalDriver) Write(value byte) (int, error) {
 
 /************ low level data pushing commands **********/
 func (h *LiquidCrystalDriver) expanderWrite(data byte) error {
-	return h.connection.I2cWrite([]byte{data | h.backlight})
+	return h.connection.I2cWrite(h.addr, []byte{data | h.backlight})
 }
 
 func (h *LiquidCrystalDriver) pulseEnable(data byte) (err error) {
